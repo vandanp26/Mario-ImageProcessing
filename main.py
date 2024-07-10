@@ -1,6 +1,6 @@
 import cv2
 import os
-
+# comment
 def load_templates(folder_path):
     templates = {}
     for filename in os.listdir(folder_path):
