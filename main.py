@@ -1,37 +1,53 @@
 import cv2
-import numpy as np
 import os
 
-# Print current working directory for debugging
-print("Current working directory:", os.getcwd())
+def load_templates(folder_path):
+    templates = {}
+    for filename in os.listdir(folder_path):
+        if filename.endswith('.png') or filename.endswith('.jpg'):
+            template_name = os.path.splitext(filename)[0]
+            template_image = cv2.imread(os.path.join(folder_path, filename))
+            templates[template_name] = template_image
+    return templates
 
-# Load the large image using OpenCV
-large_image_path = 'mvp_test.png'  # Assuming mvp_test.png is in the same directory as your script
-large_image = cv2.imread(large_image_path)
-if large_image is None:
-    raise FileNotFoundError(f"Failed to load image: {large_image_path}")
+def extract_roi(image_path):
+    image = cv2.imread(image_path)
+    # Define the coordinates for cropping (example coordinates)
+    # x, y, w, h = 680, 92, 75, 90  # Adjust these coordinates as needed
+    x, y, w, h = 395, 82, 125, 150
+    roi = image[y:y+h, x:x+w]
+    return roi
 
-# Load the template image
-template_path = 'green_yoshi.png'  # Assuming green_yoshi.png is in the same directory as your script
-template = cv2.imread(template_path)
-if template is None:
-    raise FileNotFoundError(f"Failed to load template image: {template_path}")
+def match_template(roi, templates):
+    best_match = None
+    best_score = -1
+    for name, template in templates.items():
+        result = cv2.matchTemplate(roi, template, cv2.TM_CCOEFF_NORMED)
+        _, max_val, _, _ = cv2.minMaxLoc(result)
+        if max_val > best_score:
+            best_score = max_val
+            best_match = name
+    return best_match
 
-# Convert the template to grayscale
-template_gray = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+# Paths
+image_path = '/Users/vandan/Sluggers_Proj/sluggers2.jpg'
+template_folder_path = '/Users/vandan/Downloads/Sluggers_Characters'  # Change this to your folder path
 
-# Perform template matching
-result = cv2.matchTemplate(cv2.cvtColor(large_image, cv2.COLOR_BGR2GRAY), template_gray, cv2.TM_CCOEFF_NORMED)
+# Load templates
+templates = load_templates(template_folder_path)
 
-# Threshold to find matches
-threshold = 0.8  # Adjust this threshold as needed
-loc = np.where(result >= threshold)
+# Extract ROI
+roi = extract_roi(image_path)
 
-# Draw rectangles around matched areas
-for pt in zip(*loc[::-1]):
-    cv2.rectangle(large_image, pt, (pt[0] + template_gray.shape[1], pt[1] + template_gray.shape[0]), (0, 255, 0), 2)
+# Match template
+best_match = match_template(roi, templates)
 
-# Display the result
-cv2.imshow('Yoshi Found', large_image)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# Display the cropped image and the best match
+if best_match:
+    print(f'The best match is: {best_match}')
+    cv2.imshow('Cropped Image', roi)
+    cv2.imshow('Best Match', templates[best_match])
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+else:
+    print('No match found.')
