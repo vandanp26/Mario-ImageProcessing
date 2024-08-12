@@ -33,13 +33,30 @@ def match_template(roi, templates):
 
 # Define URLs for the images in the GitHub repository
 github_image_urls = [
-    ""
+  "https://raw.githubusercontent.com/jacksonmacdonald21/Sluggers-MVP-Image-Processor/main/characters/baby_peach.jpg",
+  "https://raw.githubusercontent.com/jacksonmacdonald21/Sluggers-MVP-Image-Processor/main/characters/blue_yoshi.jpg",
+  "https://raw.githubusercontent.com/jacksonmacdonald21/Sluggers-MVP-Image-Processor/main/characters/boo.jpg",
+  "https://raw.githubusercontent.com/jacksonmacdonald21/Sluggers-MVP-Image-Processor/main/characters/parakoopa.jpg",
+  "https://raw.githubusercontent.com/jacksonmacdonald21/Sluggers-MVP-Image-Processor/main/characters/pink_pianta.jpg",
+  "https://raw.githubusercontent.com/jacksonmacdonald21/Sluggers-MVP-Image-Processor/main/characters/waluigi.jpg",
+  "https://raw.githubusercontent.com/jacksonmacdonald21/Sluggers-MVP-Image-Processor/main/characters/wario.jpg",
+  "https://raw.githubusercontent.com/jacksonmacdonald21/Sluggers-MVP-Image-Processor/main/characters/yellow_pianta.jpg",
+  "https://raw.githubusercontent.com/jacksonmacdonald21/Sluggers-MVP-Image-Processor/main/characters/yellow_toad.jpg",
+  "https://raw.githubusercontent.com/jacksonmacdonald21/Sluggers-MVP-Image-Processor/main/characters/baby_dk.jpg",
+  "https://raw.githubusercontent.com/jacksonmacdonald21/Sluggers-MVP-Image-Processor/main/characters/blue_toad.jpg",
+  "https://raw.githubusercontent.com/jacksonmacdonald21/Sluggers-MVP-Image-Processor/main/characters/dark_drybones.jpg",
+  "https://raw.githubusercontent.com/jacksonmacdonald21/Sluggers-MVP-Image-Processor/main/characters/donkey_kong.jpg",
+  "https://raw.githubusercontent.com/jacksonmacdonald21/Sluggers-MVP-Image-Processor/main/characters/green_yoshi.jpg",
+  "https://raw.githubusercontent.com/jacksonmacdonald21/Sluggers-MVP-Image-Processor/main/characters/mario.jpg",
+  "https://raw.githubusercontent.com/jacksonmacdonald21/Sluggers-MVP-Image-Processor/main/characters/red_magikoopa.jpg",
+  "https://raw.githubusercontent.com/jacksonmacdonald21/Sluggers-MVP-Image-Processor/main/characters/wiggler.jpg",
+  "https://raw.githubusercontent.com/jacksonmacdonald21/Sluggers-MVP-Image-Processor/main/characters/yellow_magikoopa.jpg",
 ]
 
 # Load templates from GitHub
 templates = load_templates(github_image_urls)
 
-# Load the image
+# Load the image, put the pictures I sent you in the path
 image_path = ''
 image = cv2.imread(image_path)
 
