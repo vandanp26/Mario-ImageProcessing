@@ -1,8 +1,54 @@
 import cv2
 import numpy as np
 import requests
-import os
-import gspread
+import pytesseract
+from pytesseract import Output
+
+def enhance_image(roi):
+    """
+    Enhances the ROI by converting to grayscale.
+    """
+    # Convert to grayscale
+    gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+    
+    return gray
+
+def read_six_numbers_below_character(image, x, y, w, h, y_shift=50):
+    numbers = []
+    step = 145  # Adjust this value based on the spacing between rows in your image
+
+    y += y_shift  # Shift the y-coordinate down to align the boxes properly
+
+    for i in range(6):
+        roi_y = y + i * step
+        roi = extract_roi(image, x, roi_y, w, 120)
+
+        # Enhance ROI for better OCR
+        processed_roi = enhance_image(roi)
+        
+        # OCR with single number/character recognition
+        text = pytesseract.image_to_string(
+            processed_roi, 
+            config='--psm 6 --oem 1 -c tessedit_char_whitelist=0123456789'
+        )
+        
+        # Clean up the text to only extract digits
+        text = ''.join(filter(str.isdigit, text))
+        
+        if text:
+            numbers.append(text)
+        else:
+            numbers.append('0')  # If no text is found, assume 0 or some default
+        
+        # Draw rectangle around the ROI on the original image for visualization
+        cv2.rectangle(image, (x, roi_y), (x + w, roi_y + 120), (0, 255, 0), 2)
+    
+    # Display the image with the highlighted ROIs
+    cv2.imshow('ROIs for Numbers', image)
+    cv2.waitKey(1000)
+    cv2.destroyAllWindows()
+
+    return numbers
 
 def load_templates_from_github(urls):
     templates = {}
@@ -54,10 +100,10 @@ github_image_urls = [
 ]
 
 # Load templates from GitHub
-templates = load_templates(github_image_urls)
+templates = load_templates_from_github(github_image_urls)
 
-# Load the image, put the pictures I sent you in the path
-image_path = ''
+# Load the image
+image_path = '/Users/jacksonmacdonald/Desktop/SluggersProject/Sluggers-MVP-Image-Processor/Sluggers_Program/sluggers_elgato.png'
 image = cv2.imread(image_path)
 
 # Define the coordinates for cropping (example coordinates)
@@ -71,11 +117,12 @@ for i in range(9):
     if best_match:
         print(f'The best match for x={x} is: {best_match}')
         
-        cv2.imshow('Cropped Image', roi)
-        cv2.imshow('Best Match', templates[best_match])
-        cv2.waitKey(2000)
-        cv2.destroyAllWindows()
-    else:
-        print(f'No match found for x={x}.')
+        # Shift the starting y-coordinate down by 60 pixels (adjust as needed)
+        numbers = read_six_numbers_below_character(image, x, y, w, h, y_shift=200)
+        
+        if numbers:
+            print(f'Read numbers: {numbers}')
+        else:
+            print('No numbers found in the column.')
 
     x += 170
